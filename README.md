@@ -45,3 +45,37 @@ Contributions, ideas, and feedback are welcome!
 If you'd like to collaborate or share suggestions:  
 **[marcoconti.1991@gmail.com]**  
 **[https://www.marcoconti1991.com/]**
+
+## Run this locally / Prerequisites
+To run the OpenF1Dashboard locally, ensure you have the following installed:
+
+    .NET 8.0 SDK
+    The project is built with .NET 8.0, so you’ll need the .NET SDK installed on your machine.
+    Download .NET SDK
+
+    Node.js (for Blazor WebAssembly Dev Server)
+    The Blazor WebAssembly application requires Node.js for the local development server.
+    Download Node.js
+
+    Visual Studio or Visual Studio Code
+    We recommend using Visual Studio (with the "ASP.NET and web development" workload) or Visual Studio Code for development.
+    Download Visual Studio
+
+## Getting Started
+
+First, clone the repository to your local machine:
+
+    git clone https://github.com/yourusername/OpenF1Dashboard.git
+    cd OpenF1Dashboard
+
+Restore NuGet dependencies. Run the following command to restore all required dependencies:
+
+    dotnet restore
+
+Build the project after restoring the dependencies
+
+    dotnet build
+
+Run the application. To start the application locally, run the following command:
+
+    dotnet run
