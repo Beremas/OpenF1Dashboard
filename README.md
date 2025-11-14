@@ -1,6 +1,12 @@
 ﻿## 🚧 Project Status
 This project is currently **in development**. Expect updates, new features, and occasional bugs as things evolve!
 
+## 👁️👁️ Sneak peek
+
+<img width="2540" height="1396" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/990e84a5-64b0-4922-be78-1a22b6d46dcf" />
+<img width="2533" height="1377" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/39380736-f561-44ec-bcd3-b3fa67cb0dc3" />
+<img width="2540" height="1383" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/a91d7026-dae6-4092-9842-2bf68bb96787" />
+
 ## 🧭 Overview
 **OpenF1 Dashboard** is an interactive web application built with **Blazor**, designed to help users explore detailed F1 historical data races.
 The dashboard provides a modern interface that includes an informational popup introducing the tool and its features.
