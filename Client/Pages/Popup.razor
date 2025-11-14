@@ -1,0 +1,46 @@
+﻿<link href="../css/popup.css" rel="stylesheet" />
+
+@if (showInfoPopup)
+{
+    <div class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-btn" @onclick="ClosePopup">×</button>
+
+            <div class="popup-header">
+                <h1>OpenF1 Dashboard</h1>
+            </div>
+
+            <div class="popup-body">
+                <p>
+                    The <strong>OpenF1 Dashboard</strong> is an interactive web application built with <strong>Blazor</strong> that lets you
+                    explore detailed Formula 1 race analytics.
+                </p>
+
+                <div class="popup-card">
+                    <p>Use the <strong>Analyzer</strong> page to:</p>
+                    <ul>
+                        <li>Visualize <strong>lap-by-lap performance</strong> of each driver.</li>
+                        <li>Compare <strong>pit stop strategies</strong> and tyre stints across teams.</li>
+                        <li>View the final race standings and best laps.</li>
+                        <li>Identify drivers who were <strong>retired, disqualified,</strong> or <strong>did not start (DNS)</strong>.</li>
+                    </ul>
+
+                    <p>
+                        Select a <strong>year, circuit, session type,</strong> and the number of drivers to display,
+                        then watch the charts and tables update instantly.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool showInfoPopup = true;
+
+    private void ClosePopup()
+    {
+        showInfoPopup = false;
+    }
+}

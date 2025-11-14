@@ -1,0 +1,1 @@
+ dotnet run OpenF1Dashboard.Server.csproj 

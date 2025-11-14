@@ -1,0 +1,59 @@
+## Build files
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.rsuser
+
+# Logs & temp files
+*.log
+*.tlog
+*.tmp
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.cache
+# Uncomment if you're using .nuke
+# .nuke/
+
+# ASP.NET / Blazor artifacts
+wwwroot/*.cache
+wwwroot/*.gz
+wwwroot/*.br
+
+# Node-related (if using JS tooling)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Rider / JetBrains IDE
+.idea/
+
+# Backup files
+*.bak
+*.orig
+
+# Publish output
+publish/
+dist/
+
+# Environment files
+*.env
+.env.*

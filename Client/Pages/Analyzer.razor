@@ -1,0 +1,236 @@
+﻿@page "/analyzer"
+@using OpenF1Dashboard.Shared.Enums
+@using OpenF1Dashboard.Shared.Views
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<link href="../css/analyzer.css" rel="stylesheet" />
+
+<div class="dashboard">
+
+    <div class="header">
+        <div class="controls">
+            <label class="muted">Year</label>
+            <select @bind="SelectedYear">@foreach (var y in Years) {
+            <option value="@y">@y</option>
+                        }
+            </select>
+
+            <label class="muted">Circuit</label>
+            <select @bind="SelectedCircuit">@foreach (var r in Enum.GetValues<CircuitShortName>()) {
+            <option value="@r">@r</option>
+                        }
+            </select>
+
+            <label class="muted">Drivers</label>
+            <select @bind="SelectedDriversNumber">@for (var r = 1; r <= 20; r++) {
+            <option value="@r">@r</option>
+                        }
+            </select>
+
+            <label class="muted">Session Type</label>
+            <select @bind="SelectedSession">@foreach (var r in Enum.GetValues<SessionTypes>()) {
+            <option value="@r">@r</option>
+                        }
+            </select>
+
+            <button @onclick="Refresh">Refresh</button>
+        </div>
+    </div>
+
+    <!-- Fastest Driver & Non-Finisher -->
+    <div class="cards top">
+        <div class="card">
+            <h4>Fastest Driver</h4>
+            <table>
+                <thead><tr><th>Driver</th><th>Fastest Lap</th><th>Stint</th><th>Pit</th></tr></thead>
+                <tbody>
+                    @if (SelectedSession == SessionTypes.Race)
+                    {
+                        @if (analysis != null && analysis?.FastestDriver != null && analysis?.FastestDriver.Race != null)
+                        {
+                            <tr>
+                                <td>@analysis.FastestDriver.FullName</td>
+                                <td>@analysis.FastestDriver.Race.BestLapTimeFormatted</td>
+                                <td>@analysis.FastestDriver.Race.Stints</td>
+                                <td>@analysis.FastestDriver.Race.Pits</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="muted">No data available</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h4>Disqualified or Retired Drivers</h4>
+            <table>
+                <thead><tr><th>Driver</th><th>DNF</th><th>DNS</th><th>DSQ</th></tr></thead>
+                <tbody>
+                    @if (SelectedSession == SessionTypes.Race)
+                    {
+                        @if (analysis?.Drivers != null && analysis.Drivers.Any())
+                        {
+                            @foreach (var d in analysis.Drivers)
+                            {
+                                @if (d.Race != null && !d.Race.IsFinisher)
+                                {
+                                    <tr>
+                                        <td>@d.FullName</td>
+                                        <td>@(d.Race.Dnf ? "Yes" : "")</td>
+                                        <td>@(d.Race.Dns ? "Yes" : "")</td>
+                                        <td>@(d.Race.Dsq ? "Yes" : "")</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="muted">No data available</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+  
+    <!-- Charts & Chequered Flag  -->
+    <div style="display:flex; flex-wrap:wrap; gap:1rem;">
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+           
+            <!-- Map chart -->
+            <div class="card" style="max-width: fit-content;">
+                <h3 style="margin-top:0">Circuit Map</h3>
+                <div id="circuit-map" style="height: 400px; width: 640px; min-width: 400px;"></div>
+            </div>
+            
+            <!-- Lap chart -->
+            <div class="card" style="max-width:fit-content">
+                <h3 style="margin-top:0">Lap Time (by Lap)</h3>
+                <canvas id="lapChart"></canvas>
+            </div>
+
+            <!-- Pit Stop / Tyre Stints chart -->
+            <div class="card" style="max-width:fit-content">
+                <h3 style="margin-top:0">Pit Stop Timeline & Tyre Stints</h3>
+                <canvas id="stintChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Chequered Flag table:-->
+        <div style="flex:1.5; min-width:400px; display:flex; flex-direction:column;">
+            <div class="card" style="flex:1; overflow-y:auto;">
+                <h4 style="margin-top:0">Chequered Flag</h4>
+                <table>
+                    <thead>
+                        <tr><th>Pos</th><th>Driver</th><th>Best Lap</th><th>Pits</th><th>Stints</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (SelectedSession == SessionTypes.Race)
+                        {
+                            @if (analysis?.Drivers != null && analysis.Drivers.Any())
+                            {
+                                @foreach (var d in analysis.Drivers)
+                                {
+                                    @if (d.Race != null && d.Race.IsFinisher)
+                                    {
+                                        <tr>
+                                            <td>@(d.Race.Position + 1)</td>
+                                            <td>@d.FullName</td>
+                                            <td>@d.Race.BestLapTimeFormatted</td>
+                                            <td>@d.Race.Pits</td>
+                                            <td>@d.Race.Stints</td>
+                                   </tr>
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="muted">No data available</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+@code {
+    private int                         SelectedYear { get; set; } = 2025;
+    private CircuitShortName            SelectedCircuit { get; set; } = CircuitShortName.Imola;
+    private int                         SelectedDriversNumber { get; set; } = 3;
+    private SessionTypes                SelectedSession { get; set; } = SessionTypes.Race;
+    private int[]                       Years = new[] { 2023, 2024, 2025 };
+    private AnalyzerSummary?            analysis;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadFromServer();
+            await InitCharts();
+        }
+    }
+
+    private async Task LoadFromServer()
+    {
+        StateHasChanged();
+        try
+        {
+            var url = $"api/f1data/analyzer?year={SelectedYear}&circuitShortName={EnumHelper.GetDescription(SelectedCircuit)}&numDriversToShow={SelectedDriversNumber}&sessionType={SelectedSession}";
+            var response = await Http.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                analysis = await response.Content.ReadFromJsonAsync<AnalyzerSummary>() ?? new AnalyzerSummary();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", $"Error loading data: {(int)response.StatusCode} {response.ReasonPhrase}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Unexpected error: {ex.Message}");
+        }
+        StateHasChanged();
+    }
+
+    private async Task InitCharts()
+    {
+        if (analysis == null) return;
+
+        var LapsCount = (analysis?.Drivers?.FirstOrDefault()?.Race?.LapTimes?.Count);
+        var LapLabels = Enumerable.Range(1, LapsCount.HasValue ? LapsCount.Value : 0).Select(i => i.ToString()).ToList();
+
+        var lapDatasets = analysis?.Drivers?
+            .Select(driver => new { label = driver.FullName, data = driver?.Race?.LapTimes, fill = false })
+            .ToArray();
+
+        var stintDatasets = analysis?.Drivers?.Select(d => new
+        {
+            full_name = d.FullName,
+            race = new
+            {
+                compound_end_lap = d.Race?.CompoundEndLap,
+                lap_times = d.Race?.LapTimes
+            }
+        }).ToList();
+
+        var geojson = analysis?.CircuitGeojson;
+
+        await JS.InvokeVoidAsync("f1Charts.initLapChart", "lapChart", LapLabels, lapDatasets);
+        await JS.InvokeVoidAsync("f1Charts.initStintChart", "stintChart", LapLabels, stintDatasets);
+        await JS.InvokeVoidAsync("f1Charts.initMapChart", geojson);
+    }
+
+    private async Task Refresh()
+    {
+        await LoadFromServer();
+        await InitCharts();
+    }
+}
